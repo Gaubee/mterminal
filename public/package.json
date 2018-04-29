@@ -1,0 +1,21 @@
+{
+  "name": "ifmchain-debugger",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "parcel-plugin-typescript": "^0.7.0",
+    "xterm": "^3.3.0",
+    "xterm-webfont": "^1.0.1"
+  },
+  "devDependencies": {
+    "typescript": "^2.8.3"
+  }
+}
