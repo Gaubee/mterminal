@@ -86,7 +86,7 @@ export class ColLayout<T extends LayoutAbleItem> implements Layout<T>{
         return true;
     }
     remove(item: T) {
-        if (!this.items.has(item)) {
+        if (this.items.has(item)) {
             const index = this.cols.indexOf(item);
             if (index !== -1) {
                 this.cols.splice(index, 1);
