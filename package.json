@@ -1,5 +1,5 @@
 {
-  "name": "ifmchain-debugger",
+  "name": "mterminal",
   "version": "1.0.0",
   "description": "Ifmchain multi-cluster logger split view.",
   "main": "log-server.js",
