@@ -1,34 +1,28 @@
-# IFMchain 多进程开发调试工具
+# mter
 
-用于将不同的进程发出的LOG打印到不同的终端中。同时会关闭原本终端的LOG输出。
+## usage
 
-基于UDP协议，也就是说LOG太多，接收端CPU爆炸高的情况下。有可能会丢包，但是到了那个时候，你的浏览器也是处于吃不消的状态，应当控制输出日志的数量。
+```
+npm i -g mter
+```
 
+usually you can run just like:
+```
+mter
+```
 
-### 开启方法
+for more information, you can run with `--help` flag.
+```
+mter --help
+# you will see:
+Options:
+  -s, --server-ip        remote server ip address                      [default: "0.0.0.0"]
+  -c, --cache-logs-line  number of cached log lines                    [default: 1000]
+  -b, --background       just run in background. and no open browser.  [default: false]
+  -h, --help             help info
+  -u, --udp-port         current process binding udp port              [default: 4511]
+  -r, --remote-udp-port  remote processes heartbeat udp port           [default: 4599]
+  -w, --web-port         current process binding http-web port         [default: 4510]
+```
 
-#### IFMchain主进程端
-设置环境变量`DEBUG`。
-语法为：`@[:process name][:ipv4-address][:host]`，其中`process name`为`p2p`或者`forget`之类的字段，`滞空`或者为`master`代表着主进程（包括单进程）
-端口默认从`4600`开始，每多一个进程，占用的端口号就会自动往上累加。
-该变量支持多个输入，使用`,`进行分割，比如:`@p2p,@web`这样就只监听了两个进程。
-不过一般情况下建议直接`@*`监听所有的进程。
-
-#### 日志服务端
-
-1. 安装依赖： `npm i`;
-1. 启动服务： `npm start`;
-
-
-### 操作与功能
-
-1. 在选中文本后，需要使用右键进行复制。
-1. 使用鼠标选中指定终端，键盘按`=(+)`为放大，`-(-)`为缩小，`0`为还原大小
-
-### TODO 
-1. 移动分割栏调整百分占比、隐藏关闭日志
-1. ~进程的CPU与内存监控面板~ （考虑到远程调试，这些信息必须由主进程提供，这就需要额外的库。）
-1. 实时与IFMchain后端通讯，提供模块函数开关面板、模块对象监控面板
-
-### 原理
-很简单，不说了
+and in remote server (your applaction). you can use [mter-rs](https://www.npmjs.com/package/mter-rs) to capture the logs.
