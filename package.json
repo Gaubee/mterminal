@@ -1,6 +1,6 @@
 {
   "name": "mter",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "multi-terminal logger split view.",
   "main": "log-server.js",
   "scripts": {
