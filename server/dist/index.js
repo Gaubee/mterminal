@@ -2,20 +2,43 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const dgram_1 = require("dgram");
 const WSSManager_1 = require("./WSSManager");
-const RECIPIENT_PORT = 4511;
+// 远程默认的端口是从4600开始累加的
 const DEFAULT_BIND_UDP_PORT = 4600;
-const SERVER_LISTEN_UDP_PORT = DEFAULT_BIND_UDP_PORT - 1;
 /// 1. 解析命令行参数
-const sip_arg = process.argv.find(arg => arg.startsWith("-sip=")) || "-sip=0.0.0.0"; //0.0.0.0代表着处理全部收到的
-const cache_arg = process.argv.find(arg => arg.startsWith("-cache=")) || "";
-if (!sip_arg) {
-    console.warn("input the -sip=192.168.*.*");
-    // process.exit(1);
+const optimist = require("optimist")
+    .usage('Usage: $0 -s [string] -c [num]')
+    .default('s', '0.0.0.0')
+    .default('c', 1000)
+    .default('b', false)
+    .default('u', 4511)
+    .default('r', DEFAULT_BIND_UDP_PORT - 1)
+    .default('w', 4510)
+    .alias('s', 'server-ip')
+    .alias('h', 'help')
+    .alias('c', 'cache-logs-line')
+    .alias('b', 'background')
+    .alias('u', 'udp-port')
+    .alias('r', 'remote-udp-port')
+    .alias('w', 'web-port')
+    .describe('s', 'remote server ip address')
+    .describe('c', 'number of cached log lines')
+    .describe('b', 'just run in background. and no open browser.')
+    .describe('h', 'help info')
+    .describe('u', 'current process binding udp port')
+    .describe('r', 'remote processes heartbeat udp port')
+    .describe('w', 'current process binding http-web port');
+const argv = optimist.argv;
+if (argv.h) {
+    optimist.showHelp();
+    process.exit(0);
 }
-const SENDER_IP = sip_arg.substr(5).trim();
-const CACHE_LOGS_LINE = parseInt(sip_arg.substr(7).trim()) || 1000;
+const SENDER_IP = argv.sip;
+const CACHE_LOGS_LINE = argv.cll;
+const WEB_PORT = argv.w;
+const SERVER_LISTEN_UDP_PORT = argv.r;
+const RECIPIENT_PORT = argv.u;
 /// 2. 启动http服务，提供wss的监听，提供public的文件服务，提供wss-api服务
-const ws_server_manager = new WSSManager_1.WSSManager({ cache_logs_line: CACHE_LOGS_LINE });
+const ws_server_manager = new WSSManager_1.WSSManager({ cache_logs_line: CACHE_LOGS_LINE, port: WEB_PORT });
 /// 3. 启动udp服务，并进行广播，获取主程序的配置响应
 const socket = dgram_1.createSocket("udp4");
 socket.on("message", (msg, rinfo) => {
@@ -46,3 +69,7 @@ socket.on("listening", () => {
     socket.setBroadcast(true);
     socket.send("PING", SERVER_LISTEN_UDP_PORT, "");
 });
+if (!argv.b) {
+    const opn = require("opn");
+    opn(`http://127.0.0.1:${WEB_PORT}/`);
+}
