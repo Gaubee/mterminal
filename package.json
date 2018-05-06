@@ -1,6 +1,6 @@
 {
   "name": "mter",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "multi-terminal logger split view.",
   "main": "log-server.js",
   "scripts": {
@@ -9,6 +9,10 @@
   },
   "author": "Gaubee",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gaubee/mterminal.git"
+  },
   "dependencies": {
     "@types/ws": "^4.0.2",
     "opn": "^5.3.0",
