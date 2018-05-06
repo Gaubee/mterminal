@@ -32,11 +32,12 @@ if (argv.h) {
     optimist.showHelp();
     process.exit(0);
 }
-const SENDER_IP = argv.sip;
-const CACHE_LOGS_LINE = argv.cll;
+const SENDER_IP = argv.s;
+const CACHE_LOGS_LINE = argv.c;
 const WEB_PORT = argv.w;
 const SERVER_LISTEN_UDP_PORT = argv.r;
 const RECIPIENT_PORT = argv.u;
+console.log(argv);
 /// 2. 启动http服务，提供wss的监听，提供public的文件服务，提供wss-api服务
 const ws_server_manager = new WSSManager_1.WSSManager({ cache_logs_line: CACHE_LOGS_LINE, port: WEB_PORT });
 /// 3. 启动udp服务，并进行广播，获取主程序的配置响应
