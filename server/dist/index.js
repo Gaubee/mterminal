@@ -43,8 +43,8 @@ const ws_server_manager = new WSSManager_1.WSSManager({ cache_logs_line: CACHE_L
 /// 3. 启动udp服务，并进行广播，获取主程序的配置响应
 const socket = dgram_1.createSocket("udp4");
 socket.on("message", (msg, rinfo) => {
-    if (msg.length === 4)
-        console.log("get msg", msg.toString(), rinfo);
+    // if (msg.length === 4)
+    //     console.log("get msg", msg.toString(), rinfo);
     if (rinfo.port === SERVER_LISTEN_UDP_PORT) {
         const msg_str = msg.toString();
         if (msg_str.startsWith("PONG:")) {
