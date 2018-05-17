@@ -2,17 +2,20 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const dgram_1 = require("dgram");
 const WSSManager_1 = require("./WSSManager");
+const debug = require("debug")("mter");
 // 远程默认的端口是从4600开始累加的
 const DEFAULT_BIND_UDP_PORT = 4600;
 /// 1. 解析命令行参数
 const optimist = require("optimist")
     .usage('Usage: $0 -s [string] -c [num]')
+    .default('m', '225.1.2.7')
     .default('s', '0.0.0.0')
     .default('c', 1000)
     .default('b', false)
     .default('u', 4511)
     .default('r', DEFAULT_BIND_UDP_PORT - 1)
     .default('w', 4510)
+    .alias('m', 'membership')
     .alias('s', 'server-ip')
     .alias('h', 'help')
     .alias('c', 'cache-logs-line')
@@ -20,6 +23,7 @@ const optimist = require("optimist")
     .alias('u', 'udp-port')
     .alias('r', 'remote-udp-port')
     .alias('w', 'web-port')
+    .describe('s', 'join a multicast group')
     .describe('s', 'remote server ip address')
     .describe('c', 'number of cached log lines')
     .describe('b', 'just run in background. and no open browser.')
@@ -32,6 +36,7 @@ if (argv.h) {
     optimist.showHelp();
     process.exit(0);
 }
+const MTER_MEMBERSHIP = argv.m;
 const SENDER_IP = argv.s;
 const CACHE_LOGS_LINE = argv.c;
 const WEB_PORT = argv.w;
@@ -42,17 +47,13 @@ const ws_server_manager = new WSSManager_1.WSSManager({ cache_logs_line: CACHE_L
 /// 3. 启动udp服务，并进行广播，获取主程序的配置响应
 const socket = dgram_1.createSocket("udp4");
 socket.on("message", (msg, rinfo) => {
-    // if (msg.length === 4)
-    //     console.log("get msg", msg.toString(), rinfo);
+    // debug("get msg", msg.toString(), rinfo);
     if (rinfo.port === SERVER_LISTEN_UDP_PORT) {
         const msg_str = msg.toString();
         if (msg_str.startsWith("PONG:")) {
             const [bind_udp_port, process_name] = msg_str.substr(5).split(":");
             ws_server_manager.heartbeat(bind_udp_port, process_name);
-        } /*  else if (msg_str.startsWith("BONG:")) {
-            const bind_udp_port = msg_str.substr(5);
-            ws_server_manager.remove(bind_udp_port);
-        } */
+        }
         return;
     }
     if (ws_server_manager.has(rinfo.port.toString())
@@ -65,11 +66,13 @@ socket.on("message", (msg, rinfo) => {
 socket.bind(RECIPIENT_PORT);
 socket.on("listening", () => {
     const socket_address = socket.address();
-    console.log("udp listen in ", socket_address);
-    socket.setBroadcast(true);
+    debug("udp listen in %o", socket_address, "membership:", MTER_MEMBERSHIP);
+    socket.addMembership(MTER_MEMBERSHIP);
     socket.send("PING", SERVER_LISTEN_UDP_PORT, "");
 });
 if (!argv.b) {
     const opn = require("opn");
-    opn(`http://127.0.0.1:${WEB_PORT}/`);
+    const web_url = `http://127.0.0.1:${WEB_PORT}/`;
+    opn(web_url);
+    debug("OPEND %s", web_url);
 }
